@@ -54,9 +54,9 @@ jobs:
         run: |
           set -e
           shopt -s nullglob
-          pkgs=( "$HOME"/*.squashfs )
+          pkgs=( /root/*.squashfs /github/home/*.squashfs )
           if [ ${#pkgs[@]} -eq 0 ]; then
-            echo "No .squashfs file found in $HOME" >&2
+            echo "No .squashfs file found" >&2
             exit 1
           fi
           ls -lh "${pkgs[@]}"
