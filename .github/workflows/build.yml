@@ -19,7 +19,7 @@ jobs:
           - runner: ubuntu-24.04-arm
             name: arm64
     runs-on: ${{ matrix.runner }}
-    name: Build Chromium (${{ matrix.name }})
+    name: Build ${{ github.event.repository.name }} (${{ matrix.name }})
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,9 +36,9 @@ jobs:
         shell: bash
         run: |
           set -e
-          . /System/Library/GNUstep.sh
+          . /System/Library/Makefiles/GNUstep.sh
           cd "$GITHUB_WORKSPACE"
-          pkgwrap chromium
+          pkgwrap "${{ github.event.repository.name }}"
 
       - name: Upload .app to continuous release
         env:
