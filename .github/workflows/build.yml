@@ -1,0 +1,56 @@
+name: Build Chromium
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            name: amd64
+          - runner: ubuntu-24.04-arm
+            name: arm64
+    runs-on: ${{ matrix.runner }}
+    name: Build Chromium (${{ matrix.name }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Bootstrap Gershwin developer environment
+        run: |
+          set -e
+          sudo git clone https://github.com/gershwin-desktop/gershwin-developer.git /Developer
+          sudo /Developer/Library/Scripts/Bootstrap.sh
+          sudo /Developer/Library/Scripts/Checkout.sh
+          cd /Developer && sudo make install
+
+      - name: Build and package Chromium
+        shell: bash
+        run: |
+          set -e
+          . /System/Library/GNUstep.sh
+          cd "$GITHUB_WORKSPACE"
+          pkgwrap chromium
+
+      - name: Upload .app to continuous release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          shopt -s nullglob
+          apps=( "$HOME"/*.app )
+          if [ ${#apps[@]} -eq 0 ]; then
+            echo "No .app file found in $HOME" >&2
+            exit 1
+          fi
+          ls -lh "${apps[@]}"
+          wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+          bash upload.sh "${apps[@]}"
