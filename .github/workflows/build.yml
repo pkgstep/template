@@ -28,6 +28,7 @@ jobs:
         run: |
           set -e
           sudo git clone https://github.com/gershwin-desktop/gershwin-developer.git /Developer
+          sudo cp /Developer/Library/OSSupport/debian.txt /Developer/Library/OSSupport/ubuntu.txt
           sudo /Developer/Library/Scripts/Bootstrap.sh
           sudo /Developer/Library/Scripts/Checkout.sh
           cd /Developer && sudo make install
