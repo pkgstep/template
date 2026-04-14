@@ -26,7 +26,7 @@ jobs:
         run: |
           set -e
           apt-get update
-          apt-get install -y sudo git ca-certificates wget squashfs-tools
+          apt-get install -y sudo git ca-certificates wget curl jq squashfs-tools
 
       - name: Checkout code
         uses: actions/checkout@v4
