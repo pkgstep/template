@@ -26,7 +26,7 @@ jobs:
         run: |
           set -e
           apt-get update
-          apt-get install -y sudo git ca-certificates wget
+          apt-get install -y sudo git ca-certificates wget squashfs-tools
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,17 +47,17 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           pkgwrap "${{ github.event.repository.name }}"
 
-      - name: Upload .app to continuous release
+      - name: Upload .squashfs to continuous release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
           shopt -s nullglob
-          apps=( "$HOME"/*.app )
-          if [ ${#apps[@]} -eq 0 ]; then
-            echo "No .app file found in $HOME" >&2
+          pkgs=( "$HOME"/*.squashfs )
+          if [ ${#pkgs[@]} -eq 0 ]; then
+            echo "No .squashfs file found in $HOME" >&2
             exit 1
           fi
-          ls -lh "${apps[@]}"
+          ls -lh "${pkgs[@]}"
           wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-          bash upload.sh "${apps[@]}"
+          bash upload.sh "${pkgs[@]}"
