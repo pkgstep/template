@@ -19,18 +19,25 @@ jobs:
           - runner: ubuntu-24.04-arm
             name: arm64
     runs-on: ${{ matrix.runner }}
+    container: debian:12
     name: Build ${{ github.event.repository.name }} (${{ matrix.name }})
     steps:
+      - name: Install prerequisites
+        run: |
+          set -e
+          apt-get update
+          apt-get install -y sudo git ca-certificates wget
+
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Bootstrap Gershwin developer environment
         run: |
           set -e
-          sudo git clone https://github.com/gershwin-desktop/gershwin-developer.git /Developer
-          sudo /Developer/Library/Scripts/Bootstrap.sh
-          sudo /Developer/Library/Scripts/Checkout.sh
-          cd /Developer && sudo make install
+          git clone https://github.com/gershwin-desktop/gershwin-developer.git /Developer
+          /Developer/Library/Scripts/Bootstrap.sh
+          /Developer/Library/Scripts/Checkout.sh
+          cd /Developer && make install
 
       - name: Build and package Chromium
         shell: bash
