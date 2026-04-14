@@ -48,6 +48,7 @@ jobs:
           pkgwrap "${{ github.event.repository.name }}"
 
       - name: Upload .squashfs to continuous release
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
