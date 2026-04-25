@@ -52,6 +52,7 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARCH: ${{ matrix.name }}
         run: |
           set -e
           shopt -s nullglob
@@ -60,6 +61,18 @@ jobs:
             echo "No .squashfs file found" >&2
             exit 1
           fi
-          ls -lh "${pkgs[@]}"
+          renamed=()
+          for p in "${pkgs[@]}"; do
+            dir=$(dirname "$p")
+            base=$(basename "$p" .squashfs)
+            if [[ "$base" == *-"$ARCH" ]]; then
+              renamed+=( "$p" )
+            else
+              new="$dir/${base}-${ARCH}.squashfs"
+              mv "$p" "$new"
+              renamed+=( "$new" )
+            fi
+          done
+          ls -lh "${renamed[@]}"
           wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-          bash upload.sh "${pkgs[@]}"
+          bash upload.sh "${renamed[@]}"
